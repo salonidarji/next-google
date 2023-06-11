@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react';
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
+import ViewsChart from '../components/ViewsChart';
 
 export default function List() {
     const [searchText, setSearchText] = useState("");
@@ -42,8 +43,7 @@ export default function List() {
               .then(
                 function (response) {
                       console.log("detail response:", response?.query?.pages);
-                      setPageDetailURL(response.query.pages[pageID].fullurl || "");
-                    //   window.open(pageDetailURL, "_blank")
+                      setPageDetailURL(response.query?.pages[pageID].fullurl || "");
                       getDailySiteViews(pageID);
                 }
               )
@@ -66,6 +66,7 @@ export default function List() {
 
   
     useEffect(() => {
+        console.log("siteINfo:", Object.keys(siteInfo));
         Object.keys(siteInfo)?.map((key: any, index, arr) => {
             if (index === arr.length - 1) {
                 setSearchInMainOneDay(siteInfo[key]);
@@ -75,7 +76,7 @@ export default function List() {
     
     
     const handleClose = () => {
-        setShowDialog(false)
+        setShowDialog(false);
         setSearchInOneDay("");
         setSearchInOneHour("");
         setPageDetailURL("")
@@ -91,8 +92,7 @@ export default function List() {
           const response = await axios.get(url);
           const items = response.data.items;
       
-          // Process the data as needed
-            console.log(items); // Array of objects containing hourly views data
+            console.log(items); 
             const views = items[0].views;
             setSearchInOneDay(views)
             setSearchInOneHour(Math.floor(views/24).toString())
@@ -111,9 +111,10 @@ export default function List() {
             </Grid>
 
             <Grid item xs={12} style={{ height: 400, width: '100%' }}>
-            {searchInMainOneDay && (<Typography component={'h6'}>{`Total Search performed on main wikipedia in one day: ${searchInMainOneDay}`}</Typography>)}
+            {searchInMainOneDay && data?.length > 0 && (<Typography component={'h6'}>{`Total Search performed on main wikipedia in one day: ${searchInMainOneDay}`}</Typography>)}
                 {data?.length > 0 && (
-                    <><DataGrid
+                    <>
+                        <DataGrid
                         rows={data}
                         columns={columns}
                         initialState={{
@@ -126,19 +127,31 @@ export default function List() {
                         onRowSelectionModelChange={(newRowSelectionModel) => {
                             setRowSelectionModel(newRowSelectionModel);
                             fetchPageDetail(newRowSelectionModel[0]);
-                            setShowDialog(true)
+                            newRowSelectionModel.length > 0 && setShowDialog(true)
                             console.log("row:", newRowSelectionModel);
                         } }
                         rowSelectionModel={rowSelectionModel} /></>)}
             </Grid>
 
-            <Dialog onClose={handleClose} open={showDialog}>
+            <Dialog fullWidth onClose={handleClose} open={showDialog}>
                 <DialogTitle>Page Details</DialogTitle>
                 <DialogContent>
                     <Typography component={'h6'}>Search performed in one day: {searchInOneDay}</Typography>
                     <Typography component={'h6'}>Search performed per Hour: {searchInOneHour}</Typography>
-                    <a href={pageDetailURL} style={{color:"blue"}} target='_blank'>show details page</a>
+                    <a href={pageDetailURL} style={{ color: "blue" }} target='_blank'>show details page</a>
+                    
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <div style={{height:"100%", width:"100%"}}>
+
+                            <ViewsChart  viewsData={Object.values(siteInfo)} labelData={Object.keys(siteInfo)} />
+                            </div>
+                        </Grid>
+                    </Grid>
                 </DialogContent>
+                <DialogActions>
+                    <Button variant='contained' color='primary' onClick={handleClose} >Close</Button>
+                </DialogActions>
             </Dialog>
         </Grid>
        

@@ -5,6 +5,7 @@ import styles from './page.module.css'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import { useSession } from "next-auth/react"
+import Button from '@mui/material/Button/Button';
 import List from './list/page';
 
 export default function Home() {
@@ -16,12 +17,11 @@ export default function Home() {
   }
   return (
     <main className={styles.main}>
-      {status === "authenticated" ? (<List />) : (<button
+      {status === "authenticated" ? (<List />) : (<Button variant ='contained' color='primary'
         onClick={handleClick}
       >
-        
-        Continue with Google
-      </button>)}
+        Sign In with Google
+      </Button>)}
     </main>
   )
 }

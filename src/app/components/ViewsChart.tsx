@@ -1,6 +1,6 @@
-import { Line } from 'react-chartjs-2';
-import { useEffect, useState } from 'react';
-import { ChartData,Chart, registerables } from 'chart.js';
+import { Line } from "react-chartjs-2";
+import { useEffect, useState } from "react";
+import { ChartData, Chart, registerables } from "chart.js";
 
 interface ViewsChartProps {
   viewsData: string[];
@@ -13,13 +13,13 @@ const ViewsChart: React.FC<ViewsChartProps> = ({ viewsData, labelData }) => {
   Chart.register(...registerables);
   useEffect(() => {
     const data: ChartData = {
-      labels: labelData, 
+      labels: labelData,
       datasets: [
         {
-          label: 'Views',
+          label: "Views",
           data: viewsData as [],
           fill: false,
-          borderColor: 'rgb(75, 192, 192)',
+          borderColor: "rgb(75, 192, 192)",
           tension: 0.1,
         },
       ],
